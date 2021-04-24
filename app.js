@@ -1,7 +1,7 @@
 "use strict";
 
 
-// Time spent on project: 15 hours
+// Time spent on project: 18 hours
 
 /** Express app for jobly. */
 
