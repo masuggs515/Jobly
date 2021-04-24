@@ -67,11 +67,11 @@ class Company {
 
     if (minEmployees > maxEmployees) throw new BadRequestError("minimum input can not be higher than maximum input");
 
-      // if name, minEmployees, or maxEmployees is found, add value in to queryValues array
-      // and in queryAdders array, add in the query string for input of value. In place of value 
-      // in query string, add length of array AFTER pushing value in to queryValues so that the input number
-      // will equal the placement in the queryValues Array. 
-      // Will end up being name =$1
+    // if name, minEmployees, or maxEmployees is found, add value in to queryValues array
+    // and in queryAdders array, add in the query string for input of value. In place of value 
+    // in query string, add length of array AFTER pushing value in to queryValues so that the input number
+    // will equal the placement in the queryValues Array. 
+    // Will end up being name =$1
 
     if (name) {
       queryValues.push(`%${name}%`);
@@ -123,9 +123,24 @@ class Company {
            WHERE handle = $1`,
       [handle]);
 
+
     const company = companyRes.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
+
+
+    const jobRes = await db.query(
+      `SELECT id, title, salary, equity
+      FROM jobs
+      WHERE company_handle =$1`,
+      [handle]
+    );
+    
+
+    const jobs = jobRes.rows;
+    if(jobs.length>0){
+    company.jobs = jobs;
+    }
 
     return company;
   }

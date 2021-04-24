@@ -85,31 +85,6 @@ describe("findAll", function () {
       },
     ]);
   });
-});
-
-/************************************** get */
-
-describe("get", function () {
-  test("works", async function () {
-    let company = await Company.get("c1");
-    expect(company).toEqual({
-      handle: "c1",
-      name: "C1",
-      description: "Desc1",
-      numEmployees: 1,
-      logoUrl: "http://c1.img",
-    });
-  });
-
-  test("not found if no such company", async function () {
-    try {
-      await Company.get("nope");
-      fail();
-    } catch (err) {
-      expect(err instanceof NotFoundError).toBeTruthy();
-    }
-  });
-
   test("filters and finds any company that includes given name", async ()=>{
     const company = await Company.findAll({"name": "1"});
     expect(company).toEqual([{
@@ -141,6 +116,38 @@ describe("get", function () {
       numEmployees: 1,
       logoUrl: "http://c1.img",
     }])
+  });
+});
+
+/************************************** get */
+
+describe("get", function () {
+  test("works", async function () {
+    let company = await Company.get("c1");
+    expect(company).toEqual({
+      handle: "c1",
+      name: "C1",
+      description: "Desc1",
+      numEmployees: 1,
+      logoUrl: "http://c1.img",
+      jobs: [
+        {
+          id: 1,
+          title: "J1",
+          salary: 50000,
+          equity: "0.5" 
+    }
+      ]
+    });
+  });
+
+  test("not found if no such company", async function () {
+    try {
+      await Company.get("nope");
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
   });
 });
 

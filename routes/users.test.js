@@ -12,6 +12,7 @@ const {
   commonAfterEach,
   commonAfterAll,
   u1Token,
+  u2Token,
   adminToken
 } = require("./_testCommon");
 
@@ -166,7 +167,7 @@ describe("GET /users", function () {
 /************************************** GET /users/:username */
 
 describe("GET /users/:username", function () {
-  test("works for admin", async function () {
+  test("works for admin with applied jobs", async function () {
     const resp = await request(app)
         .get(`/users/u1`)
         .set("authorization", `Bearer ${adminToken}`);
@@ -177,11 +178,14 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: false,
+        jobs:[{
+          "jobId": 1
+        }]        
       },
     });
   });
 
-  test("works for same user", async function () {
+  test("works for same user with applied jobs", async function () {
     const resp = await request(app)
         .get(`/users/u1`)
         .set("authorization", `Bearer ${u1Token}`);
@@ -192,6 +196,9 @@ describe("GET /users/:username", function () {
         lastName: "U1L",
         email: "user1@user.com",
         isAdmin: false,
+        jobs:[{
+          "jobId": 1
+        }]     
       },
     });
   });
@@ -327,5 +334,35 @@ describe("DELETE /users/:username", function () {
         .delete(`/users/nope`)
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(404);
+  });
+});
+
+// POST users/:username/jobs:id tests //////////////////////////////////
+
+describe("POST /users/:username/jobs/:id", ()=>{
+  test("works for admin", async ()=>{
+    const res = await request(app)
+              .post('/users/u1/jobs/2')
+              .set("authorization", `Bearer ${adminToken}`);
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toEqual({"applied": "2"})
+  });
+
+  test("works for same user", async ()=>{
+    const res = await request(app)
+              .post('/users/u1/jobs/2')
+              .set("authorization", `Bearer ${u1Token}`);
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toEqual({"applied": "2"})
+  });
+
+  test("unauth for other user", async ()=>{
+    const res = await request(app)
+              .post('/users/u1/jobs/2')
+              .set("authorization", `Bearer ${u2Token}`);
+
+    expect(res.statusCode).toEqual(401);
   });
 });

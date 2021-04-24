@@ -73,7 +73,7 @@ async function commonBeforeAll() {
     title: "J2", 
     salary: 100000, 
     equity: 0, 
-    companyHandle: "c2" 
+    companyHandle: "c1" 
   });
   await Job.create({ 
     id: 3, 
@@ -82,6 +82,7 @@ async function commonBeforeAll() {
     equity: 0.5, 
     companyHandle: "c3" 
   });
+  await User.applied("u1", 1)
 }
 
 async function commonBeforeEach() {
@@ -109,5 +110,6 @@ module.exports = {
   commonAfterEach,
   commonAfterAll,
   u1Token,
+  u2Token,
   adminToken
 };

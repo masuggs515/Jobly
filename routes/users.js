@@ -24,7 +24,7 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * Authorization required: login
+ * Authorization required: admin
  **/
 
 router.post("/", ensureLoggedIn, async function (req, res, next) {
@@ -50,7 +50,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns list of all users.
  *
- * Authorization required: login
+ * Authorization required: none
  **/
 
 router.get("/", ensureLoggedIn, async function (req, res, next) {
@@ -70,7 +70,7 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: admin or logged in same user
  **/
 
 router.get("/:username", ensureLoggedIn, async function (req, res, next) {
@@ -94,7 +94,7 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: admin or logged in same user
  **/
 
 router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
@@ -120,7 +120,7 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: admin or logged in same user
  **/
 
 router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
@@ -135,6 +135,22 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
     return next(err);
   }
 });
+
+/* POST /[username]/jobs/[id] => {applied: jobId}
+
+Authorization required: admin or logged in same user
+*/
+router.post('/:username/jobs/:id', async (req, res, next)=>{
+  try {
+    await User.applied(req.params.username, req.params.id)
+    if (res.locals.user.isAdmin === false && res.locals.user.username !== req.params.username) {
+      throw new UnauthorizedError("Only admin or this user can reach this route");
+    }
+    return res.status(201).json({applied: req.params.id})
+  } catch (err) {
+    return next(err)
+  }
+})
 
 
 module.exports = router;

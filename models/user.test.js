@@ -228,3 +228,22 @@ describe("remove", function () {
     }
   });
 });
+
+describe("applied", ()=>{
+  test("works", async ()=>{
+    await User.applied("u1", 1);
+    const checkApp = await db.query(`SELECT * FROM applications
+                                    WHERE username='u1' AND job_id=1
+                                    `)
+    expect(checkApp.rows.length).toEqual(1);
+  });
+
+  test("error on duplicates", async ()=>{
+    await User.applied("u1", 1);
+    try {
+      await User.applied("u1", 1);
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }   
+  });
+})
